@@ -10,11 +10,11 @@ export const errorHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  res.status(error.status).json({
+  res.status(error.status || 500).json({
     status: error.status || 500,
     name: error.name || 'Internal Server Error',
     message:
       error.message ||
-      'The server has encountered a situation it does not know how to handle.'
+      'The server has encountered a situation it does not know how to handle'
   });
 };

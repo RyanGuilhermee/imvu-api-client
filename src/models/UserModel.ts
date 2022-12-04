@@ -2,22 +2,26 @@ import { PrismaClient, User } from '@prisma/client';
 import { BadRequest } from '@src/errors/BadRequest';
 import { InternalServerError } from '@src/errors/InternalServerError';
 import { NotFound } from '@src/errors/NotFound';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 export class UserModel {
   public async create(userData: User): Promise<User> {
     const exists: boolean = await this.userExists(userData.email);
 
     if (exists) {
-      throw new BadRequest('User already exists.');
+      throw new BadRequest('User already exists');
     }
 
     const prismaClient = new PrismaClient();
+
+    const hashPassword: string = await bcrypt.hash(userData.password, 10);
 
     const user = await prismaClient.user.create({
       data: {
         name: userData.name,
         email: userData.email,
-        password: userData.password
+        password: hashPassword
       }
     });
 
@@ -32,7 +36,7 @@ export class UserModel {
     });
 
     if (!user) {
-      throw new NotFound('User not found.');
+      throw new NotFound('User not found');
     }
 
     return user;
@@ -42,7 +46,7 @@ export class UserModel {
     const exists: boolean = await this.userExists(userId);
 
     if (!exists) {
-      throw new BadRequest('User does not exist.');
+      throw new BadRequest('User does not exist');
     }
 
     const prismaClient = new PrismaClient();
@@ -71,5 +75,40 @@ export class UserModel {
     }
 
     return true;
+  }
+
+  public async authentication(
+    email: string,
+    password: string
+  ): Promise<string> {
+    if (!email || !password) {
+      throw new BadRequest('Email or password is missing');
+    }
+
+    const prismaClient = new PrismaClient();
+
+    const user = await prismaClient.user.findFirst({
+      where: { email: email }
+    });
+
+    if (!user) {
+      throw new BadRequest('Incorrect email or password');
+    }
+
+    const isCorrectPassword = await bcrypt.compare(password, user.password);
+
+    if (!isCorrectPassword) {
+      throw new BadRequest('Incorrect email or password');
+    }
+
+    const token = jwt.sign(
+      { id: user.id, name: user.name },
+      process.env.JWT_SECRET as string,
+      {
+        expiresIn: 300
+      }
+    );
+
+    return token;
   }
 }

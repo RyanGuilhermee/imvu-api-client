@@ -9,33 +9,37 @@ import {
   Post
 } from '@overnightjs/core';
 import { User } from '@prisma/client';
-import { errorHandler } from '@src/middlewares/ErrorMiddleware';
+import { errorHandler } from '@src/middlewares/errorMiddleware';
+import { authorizationHandler } from '@src/middlewares/authorizationMiddleware';
 import { Request, Response } from 'express';
 
 @Controller('user')
 @ClassErrorMiddleware(errorHandler)
 export class UserController {
   @Post('create')
+  @Middleware(authorizationHandler)
   public async create(req: Request, res: Response): Promise<void> {
     const userModel: UserModel = new UserModel();
     const dataUser: User = req.body;
 
-    const user = await userModel.create(dataUser);
+    const user: User = await userModel.create(dataUser);
 
-    res.status(200).json(user);
+    res.status(201).json(user);
   }
 
   @Get(':id')
+  @Middleware(authorizationHandler)
   public async get(req: Request, res: Response): Promise<void> {
     const userModel: UserModel = new UserModel();
     const userId: number = Number(req.params.id);
 
-    const user = await userModel.get(userId);
+    const user: User = await userModel.get(userId);
 
     res.status(200).json(user);
   }
 
   @Delete(':id')
+  @Middleware(authorizationHandler)
   public async delete(req: Request, res: Response): Promise<void> {
     const userModel: UserModel = new UserModel();
     const userId: number = Number(req.params.id);
@@ -43,5 +47,17 @@ export class UserController {
     const user = await userModel.delete(userId);
 
     res.status(200).json(user);
+  }
+
+  @Post('login')
+  public async authentication(req: Request, res: Response): Promise<void> {
+    const userModel: UserModel = new UserModel();
+    const { email, password }: { email: string; password: string } = req.body;
+
+    const token: string = await userModel.authentication(email, password);
+
+    res.status(200).json({
+      token
+    });
   }
 }

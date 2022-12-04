@@ -28,6 +28,7 @@ model UserImvuAccount {
   user       User     @relation(fields: [user_id], references: [id])
   user_id    Int
   created_at DateTime @default(now())
+  update_at  DateTime @updatedAt
 
   @@map("user_imvu_accounts")
 }

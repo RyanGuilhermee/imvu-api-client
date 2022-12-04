@@ -23,7 +23,7 @@ afterAll(async () => {
 });
 
 describe('User route', () => {
-  it('should create a user', async () => {
+  it('should create a new user', async () => {
     const response = await global.globalRequest.post('/user/create').send({
       name: 'test1',
       email: 'test@gmail.com',
