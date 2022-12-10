@@ -29,6 +29,18 @@ model UserImvuAccount {
   user_id    Int
   created_at DateTime @default(now())
   update_at  DateTime @updatedAt
+  Reward     Reward[]
 
   @@map("user_imvu_accounts")
+}
+
+model Reward {
+  id              String          @id @default(uuid())
+  name            String
+  image           String
+  imvu_account    UserImvuAccount @relation(fields: [imvu_account_id], references: [id])
+  imvu_account_id Int
+  created_at      DateTime        @default(now())
+
+  @@map("rewards")
 }
