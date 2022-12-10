@@ -2,6 +2,7 @@ import { json } from 'express';
 import { Server } from '@overnightjs/core';
 import { HomeController } from '@controllers/HomeController';
 import { UserController } from '@controllers/UserController';
+import { ImvuAccountController } from './controllers/ImvuAccountController';
 import 'express-async-errors';
 import dotenv from 'dotenv';
 
@@ -22,7 +23,13 @@ export class SetupServer extends Server {
   private setupControllers(): void {
     const homeController = new HomeController();
     const userController = new UserController();
-    this.addControllers([homeController, userController]);
+    const imvuAccountController = new ImvuAccountController();
+
+    this.addControllers([
+      homeController,
+      userController,
+      imvuAccountController
+    ]);
   }
 
   public init(): void {

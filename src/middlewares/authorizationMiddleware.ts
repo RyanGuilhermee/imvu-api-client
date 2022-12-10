@@ -9,8 +9,6 @@ export const authorizationHandler = (
 ) => {
   const fullToken: string | undefined = req.headers.authorization;
 
-  console.log(fullToken);
-
   if (!fullToken) {
     throw new Unauthorized('Token is missing');
   }

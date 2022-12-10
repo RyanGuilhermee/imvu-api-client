@@ -2,7 +2,6 @@ import { UserModel } from '@models/UserModel';
 import {
   Controller,
   Middleware,
-  ErrorMiddleware,
   ClassErrorMiddleware,
   Delete,
   Get,
@@ -20,9 +19,9 @@ export class UserController {
   @Middleware(authorizationHandler)
   public async create(req: Request, res: Response): Promise<void> {
     const userModel: UserModel = new UserModel();
-    const dataUser: User = req.body;
+    const userData: User = req.body;
 
-    const user: User = await userModel.create(dataUser);
+    const user: User = await userModel.create(userData);
 
     res.status(201).json(user);
   }

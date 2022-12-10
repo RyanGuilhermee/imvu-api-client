@@ -105,7 +105,7 @@ export class UserModel {
       { id: user.id, name: user.name },
       process.env.JWT_SECRET as string,
       {
-        expiresIn: 300
+        expiresIn: '1h'
       }
     );
 
