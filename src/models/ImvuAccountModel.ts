@@ -1,7 +1,7 @@
 import { PrismaClient, UserImvuAccount } from '@prisma/client';
 import { BadRequest } from '@src/errors/BadRequest';
 import { NotFound } from '@src/errors/NotFound';
-import bcrypt from 'bcrypt';
+import CryptoJS from 'crypto-js';
 
 export class ImvuAccountModel {
   public async create(
@@ -18,16 +18,16 @@ export class ImvuAccountModel {
 
     const prismaClient = new PrismaClient();
 
-    const hashPassword: string = await bcrypt.hash(
+    const cipherPass = CryptoJS.AES.encrypt(
       imvuAccountData.password,
-      10
-    );
+      process.env.CRYPTO_KEY as string
+    ).toString();
 
     const imvuAccount = await prismaClient.userImvuAccount.create({
       data: {
         user_id: imvuAccountData.user_id,
         username: imvuAccountData.username,
-        password: hashPassword
+        password: cipherPass
       }
     });
 
@@ -51,10 +51,13 @@ export class ImvuAccountModel {
 
     const prismaClient = new PrismaClient();
 
-    let hashPassword: string | undefined = undefined;
+    let cipherPass: string | undefined = undefined;
 
     if (imvuAccountData.password) {
-      hashPassword = await bcrypt.hash(imvuAccountData.password, 10);
+      cipherPass = CryptoJS.AES.encrypt(
+        imvuAccountData.password,
+        process.env.CRYPTO_KEY as string
+      ).toString();
     }
 
     const imvuAccount = await prismaClient.userImvuAccount.update({
@@ -63,7 +66,7 @@ export class ImvuAccountModel {
       },
       data: {
         username: imvuAccountData.username,
-        password: hashPassword
+        password: cipherPass
       }
     });
 
