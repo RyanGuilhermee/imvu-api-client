@@ -78,7 +78,7 @@ export class ImvuAccountModel {
 
     const imvuAccounts = await prismaClient.userImvuAccount.findMany({
       where: { user_id: userId || undefined, id: accountId || undefined },
-      orderBy: { id: 'asc' }
+      orderBy: { username: 'asc' }
     });
 
     if (!imvuAccounts.length) {

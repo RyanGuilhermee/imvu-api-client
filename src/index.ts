@@ -3,15 +3,13 @@ import { Server } from '@overnightjs/core';
 import { HomeController } from '@controllers/HomeController';
 import { UserController } from '@controllers/UserController';
 import { ImvuAccountController } from './controllers/ImvuAccountController';
+import { RewardController } from './controllers/RewardController';
 import 'express-async-errors';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
 export class SetupServer extends Server {
-  /**
-   *
-   */
   constructor(private port = 3000) {
     super();
   }
@@ -24,11 +22,13 @@ export class SetupServer extends Server {
     const homeController = new HomeController();
     const userController = new UserController();
     const imvuAccountController = new ImvuAccountController();
+    const rewardController = new RewardController();
 
     this.addControllers([
       homeController,
       userController,
-      imvuAccountController
+      imvuAccountController,
+      rewardController
     ]);
   }
 
