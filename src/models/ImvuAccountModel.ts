@@ -9,6 +9,7 @@ export class ImvuAccountModel {
   ): Promise<UserImvuAccount> {
     const exists: boolean = await this.imvuAccountExists(
       imvuAccountData.user_id,
+      '',
       imvuAccountData.username
     );
 
@@ -36,14 +37,14 @@ export class ImvuAccountModel {
 
   public async update(
     imvuAccountData: UserImvuAccount,
-    userId: number,
-    accountId: number
+    userId: string,
+    accountId: string
   ): Promise<UserImvuAccount> {
-    if (isNaN(userId) || isNaN(accountId)) {
+    if (!userId || !accountId) {
       throw new BadRequest('User or account id is missing');
     }
 
-    const exists: boolean = await this.imvuAccountExists(userId, accountId);
+    const exists: boolean = await this.imvuAccountExists(userId, accountId, '');
 
     if (!exists) {
       throw new BadRequest('Imvu account does not exists');
@@ -74,8 +75,8 @@ export class ImvuAccountModel {
   }
 
   public async get(
-    userId: number,
-    accountId: number
+    userId: string,
+    accountId: string
   ): Promise<UserImvuAccount[]> {
     const prismaClient = new PrismaClient();
 
@@ -92,14 +93,14 @@ export class ImvuAccountModel {
   }
 
   public async delete(
-    userId: number,
-    accountId: number
+    userId: string,
+    accountId: string
   ): Promise<UserImvuAccount> {
-    if (isNaN(userId) || isNaN(accountId)) {
+    if (!userId || !accountId) {
       throw new BadRequest('User or account id is missing');
     }
 
-    const exists: boolean = await this.imvuAccountExists(userId, accountId);
+    const exists: boolean = await this.imvuAccountExists(userId, accountId, '');
 
     if (!exists) {
       throw new BadRequest('Imvu account does not exist');
@@ -115,24 +116,17 @@ export class ImvuAccountModel {
   }
 
   public async imvuAccountExists(
-    userId: number,
-    accountId: number
-  ): Promise<boolean>;
-  public async imvuAccountExists(
-    userId: number,
+    userId: string,
+    accountId: string,
     username: string
-  ): Promise<boolean>;
-  public async imvuAccountExists(
-    userId: number,
-    args: number | string
   ): Promise<boolean> {
     const prismaClient = new PrismaClient();
 
     const user = await prismaClient.userImvuAccount.findFirst({
       where: {
         user_id: userId,
-        id: typeof args === 'number' ? args : undefined,
-        username: typeof args === 'string' ? args : undefined
+        id: accountId ? accountId : '',
+        username: username ? username : ''
       }
     });
 

@@ -30,8 +30,8 @@ export class ImvuAccountController {
   @Patch('q')
   public async update(req: Request, res: Response): Promise<void> {
     const accountModel: ImvuAccountModel = new ImvuAccountModel();
-    const userId: number = Number(req.query.user_id);
-    const accountId: number = Number(req.query.account_id);
+    const userId: string = req.query.user_id as string;
+    const accountId: string = req.query.account_id as string;
     const accountData: UserImvuAccount = req.body;
 
     const account: UserImvuAccount = await accountModel.update(
@@ -46,8 +46,8 @@ export class ImvuAccountController {
   @Get('q')
   public async get(req: Request, res: Response): Promise<void> {
     const accountModel: ImvuAccountModel = new ImvuAccountModel();
-    const userId: number = Number(req.query.user_id);
-    const accountId: number = Number(req.query.account_id);
+    const userId: string = req.query.user_id as string;
+    const accountId: string = req.query.account_id as string;
 
     const account: UserImvuAccount[] = await accountModel.get(
       userId,
@@ -60,8 +60,8 @@ export class ImvuAccountController {
   @Delete('q')
   public async delete(req: Request, res: Response): Promise<void> {
     const accountModel: ImvuAccountModel = new ImvuAccountModel();
-    const userId: number = Number(req.query.user_id);
-    const accountId: number = Number(req.query.account_id);
+    const userId: string = req.query.user_id as string;
+    const accountId: string = req.query.account_id as string;
 
     const account: UserImvuAccount = await accountModel.delete(
       userId,

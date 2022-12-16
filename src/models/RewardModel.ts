@@ -18,7 +18,7 @@ export class RewardModel {
     return reward;
   }
 
-  public async get(accountId: number): Promise<Reward[]> {
+  public async get(accountId: string): Promise<Reward[]> {
     const prismaClient = new PrismaClient();
 
     const reward = await prismaClient.reward.findMany({

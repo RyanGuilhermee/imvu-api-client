@@ -16,7 +16,6 @@ import { Request, Response } from 'express';
 @ClassErrorMiddleware(errorHandler)
 export class UserController {
   @Post('create')
-  @Middleware(authorizationHandler)
   public async create(req: Request, res: Response): Promise<void> {
     const userModel: UserModel = new UserModel();
     const userData: User = req.body;
@@ -30,7 +29,7 @@ export class UserController {
   @Middleware(authorizationHandler)
   public async get(req: Request, res: Response): Promise<void> {
     const userModel: UserModel = new UserModel();
-    const userId: number = Number(req.params.id);
+    const userId: string = req.params.id;
 
     const user: User = await userModel.get(userId);
 
@@ -41,7 +40,7 @@ export class UserController {
   @Middleware(authorizationHandler)
   public async delete(req: Request, res: Response): Promise<void> {
     const userModel: UserModel = new UserModel();
-    const userId: number = Number(req.params.id);
+    const userId: string = req.params.id;
 
     const user = await userModel.delete(userId);
 

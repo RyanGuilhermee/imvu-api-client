@@ -11,7 +11,7 @@ datasource db {
 }
 
 model User {
-  id              Int               @id @default(autoincrement())
+  id              String            @id @default(uuid())
   name            String
   email           String            @unique
   password        String
@@ -22,11 +22,11 @@ model User {
 }
 
 model UserImvuAccount {
-  id         Int      @id @default(autoincrement())
+  id         String   @id @default(uuid())
   username   String   @unique
   password   String
   user       User     @relation(fields: [user_id], references: [id])
-  user_id    Int
+  user_id    String
   created_at DateTime @default(now())
   update_at  DateTime @updatedAt
   Reward     Reward[]
@@ -39,7 +39,7 @@ model Reward {
   name            String
   image           String
   imvu_account    UserImvuAccount @relation(fields: [imvu_account_id], references: [id])
-  imvu_account_id Int
+  imvu_account_id String
   created_at      DateTime        @default(now())
 
   @@map("rewards")

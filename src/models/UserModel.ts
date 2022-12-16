@@ -1,13 +1,12 @@
 import { PrismaClient, User } from '@prisma/client';
 import { BadRequest } from '@src/errors/BadRequest';
-import { InternalServerError } from '@src/errors/InternalServerError';
 import { NotFound } from '@src/errors/NotFound';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
 export class UserModel {
   public async create(userData: User): Promise<User> {
-    const exists: boolean = await this.userExists(userData.email);
+    const exists: boolean = await this.userExists('', userData.email);
 
     if (exists) {
       throw new BadRequest('User already exists');
@@ -28,7 +27,7 @@ export class UserModel {
     return user;
   }
 
-  public async get(userId: number): Promise<User> {
+  public async get(userId: string): Promise<User> {
     const prismaClient = new PrismaClient();
 
     const user = await prismaClient.user.findFirst({
@@ -42,8 +41,8 @@ export class UserModel {
     return user;
   }
 
-  public async delete(userId: number): Promise<User> {
-    const exists: boolean = await this.userExists(userId);
+  public async delete(userId: string): Promise<User> {
+    const exists: boolean = await this.userExists(userId, '');
 
     if (!exists) {
       throw new BadRequest('User does not exist');
@@ -58,15 +57,13 @@ export class UserModel {
     return user;
   }
 
-  public async userExists(userId: number): Promise<boolean>;
-  public async userExists(email: string): Promise<boolean>;
-  public async userExists(args: number | string): Promise<boolean> {
+  public async userExists(userId: string, email: string): Promise<boolean> {
     const prismaClient = new PrismaClient();
 
     const user = await prismaClient.user.findFirst({
       where: {
-        id: typeof args === 'number' ? args : undefined,
-        email: typeof args === 'string' ? args : undefined
+        id: userId ? userId : undefined,
+        email: email ? email : undefined
       }
     });
 
