@@ -17,6 +17,7 @@ model User {
   password        String
   created_at      DateTime          @default(now())
   UserImvuAccount UserImvuAccount[]
+  RefreshToken    RefreshToken[]
 
   @@map("users")
 }
@@ -43,4 +44,14 @@ model Reward {
   created_at      DateTime        @default(now())
 
   @@map("rewards")
+}
+
+model RefreshToken {
+  id          String @id @default(uuid())
+  experies_in Int
+  ip_address  String @unique
+  user        User   @relation(fields: [user_id], references: [id])
+  user_id     String
+
+  @@map("refresh_token")
 }
