@@ -1,5 +1,4 @@
 import { PrismaClient, Reward } from '@prisma/client';
-import { BadRequest } from '@src/errors/BadRequest';
 import { NotFound } from '@src/errors/NotFound';
 
 export class RewardModel {
@@ -20,7 +19,7 @@ export class RewardModel {
 
   public async get(accountId: string): Promise<Reward[]> {
     const prismaClient = new PrismaClient();
-
+    console.log(accountId);
     const reward = await prismaClient.reward.findMany({
       where: {
         imvu_account_id: accountId

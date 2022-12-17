@@ -17,7 +17,7 @@ import { Request, Response } from 'express';
 @ClassMiddleware(authorizationHandler)
 @ClassErrorMiddleware(errorHandler)
 export class ImvuAccountController {
-  @Post('create')
+  @Post()
   public async create(req: Request, res: Response): Promise<void> {
     const accountModel: ImvuAccountModel = new ImvuAccountModel();
     const accountData: UserImvuAccount = req.body;

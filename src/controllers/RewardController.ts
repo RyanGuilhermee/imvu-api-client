@@ -15,7 +15,7 @@ import { Request, Response } from 'express';
 @ClassMiddleware(authorizationHandler)
 @ClassErrorMiddleware(errorHandler)
 export class RewardController {
-  @Post('create')
+  @Post()
   public async create(req: Request, res: Response): Promise<void> {
     const rewardModel: RewardModel = new RewardModel();
     const rewardData: Reward = req.body;
@@ -28,7 +28,7 @@ export class RewardController {
   @Get(':id')
   public async get(req: Request, res: Response): Promise<void> {
     const rewardModel: RewardModel = new RewardModel();
-    const accountId: string = req.query.account_id as string;
+    const accountId: string = req.params.account_id as string;
 
     const reward: Reward[] = await rewardModel.get(accountId);
 

@@ -15,7 +15,7 @@ import { Request, Response } from 'express';
 @Controller('user')
 @ClassErrorMiddleware(errorHandler)
 export class UserController {
-  @Post('create')
+  @Post()
   public async create(req: Request, res: Response): Promise<void> {
     const userModel: UserModel = new UserModel();
     const userData: User = req.body;

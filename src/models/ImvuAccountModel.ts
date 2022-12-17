@@ -23,7 +23,7 @@ export class ImvuAccountModel {
       imvuAccountData.password,
       process.env.CRYPTO_KEY as string
     ).toString();
-
+    console.log(imvuAccountData);
     const imvuAccount = await prismaClient.userImvuAccount.create({
       data: {
         user_id: imvuAccountData.user_id,
@@ -125,8 +125,8 @@ export class ImvuAccountModel {
     const user = await prismaClient.userImvuAccount.findFirst({
       where: {
         user_id: userId,
-        id: accountId ? accountId : '',
-        username: username ? username : ''
+        id: accountId ? accountId : undefined,
+        username: username ? username : undefined
       }
     });
 
