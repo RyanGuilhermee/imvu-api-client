@@ -3,6 +3,7 @@ import { BadRequest } from '@src/errors/BadRequest';
 import { NotFound } from '@src/errors/NotFound';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { RefreshTokenModel } from './RefreshTokenModel';
 
 export class UserModel {
   public async create(userData: User): Promise<User> {
@@ -76,8 +77,9 @@ export class UserModel {
 
   public async authentication(
     email: string,
-    password: string
-  ): Promise<string> {
+    password: string,
+    ipAddress: string | null
+  ): Promise<{ token: string; refreshToken?: string }> {
     if (!email || !password) {
       throw new BadRequest('Email or password is missing');
     }
@@ -98,14 +100,25 @@ export class UserModel {
       throw new BadRequest('Incorrect email or password');
     }
 
-    const token = jwt.sign(
-      { id: user.id, name: user.name },
-      process.env.JWT_SECRET as string,
-      {
-        expiresIn: '1h'
-      }
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET as string, {
+      expiresIn: '1h'
+    });
+
+    if (!ipAddress) {
+      return {
+        token
+      };
+    }
+
+    const refreshTokenModel = new RefreshTokenModel();
+    const { id } = await refreshTokenModel.generateRefreshToken(
+      user.id,
+      ipAddress
     );
 
-    return token;
+    return {
+      token,
+      refreshToken: id
+    };
   }
 }

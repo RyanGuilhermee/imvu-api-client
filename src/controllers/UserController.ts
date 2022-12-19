@@ -11,6 +11,7 @@ import { User } from '@prisma/client';
 import { errorHandler } from '@src/middlewares/errorMiddleware';
 import { authorizationHandler } from '@src/middlewares/authorizationMiddleware';
 import { Request, Response } from 'express';
+import requestIp from 'request-ip';
 
 @Controller('user')
 @ClassErrorMiddleware(errorHandler)
@@ -51,11 +52,17 @@ export class UserController {
   public async authentication(req: Request, res: Response): Promise<void> {
     const userModel: UserModel = new UserModel();
     const { email, password }: { email: string; password: string } = req.body;
+    const ipAddress: string | null = requestIp.getClientIp(req);
 
-    const token: string = await userModel.authentication(email, password);
+    const {
+      token,
+      refreshToken
+    }: { token: string; refreshToken?: string | undefined } =
+      await userModel.authentication(email, password, ipAddress);
 
     res.status(200).json({
-      token
+      token,
+      refreshToken
     });
   }
 }

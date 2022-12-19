@@ -4,6 +4,7 @@ import { HomeController } from '@controllers/HomeController';
 import { UserController } from '@controllers/UserController';
 import { ImvuAccountController } from './controllers/ImvuAccountController';
 import { RewardController } from './controllers/RewardController';
+import { RefreshTokenController } from './controllers/RefreshTokenModel';
 import 'express-async-errors';
 import dotenv from 'dotenv';
 
@@ -23,12 +24,14 @@ export class SetupServer extends Server {
     const userController = new UserController();
     const imvuAccountController = new ImvuAccountController();
     const rewardController = new RewardController();
+    const refreshTokenController = new RefreshTokenController();
 
     this.addControllers([
       homeController,
       userController,
       imvuAccountController,
-      rewardController
+      rewardController,
+      refreshTokenController
     ]);
   }
 
