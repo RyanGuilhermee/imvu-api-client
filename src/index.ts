@@ -4,7 +4,7 @@ import { HomeController } from '@controllers/HomeController';
 import { UserController } from '@controllers/UserController';
 import { ImvuAccountController } from './controllers/ImvuAccountController';
 import { RewardController } from './controllers/RewardController';
-import { RefreshTokenController } from './controllers/RefreshTokenModel';
+import { RefreshTokenController } from './controllers/RefreshTokenController';
 import 'express-async-errors';
 import dotenv from 'dotenv';
 

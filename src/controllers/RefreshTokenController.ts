@@ -1,7 +1,6 @@
 import { RefreshTokenModel } from '@models/RefreshTokenModel';
 import { Controller, ClassErrorMiddleware, Post } from '@overnightjs/core';
 import { errorHandler } from '@src/middlewares/errorMiddleware';
-import { authorizationHandler } from '@src/middlewares/authorizationMiddleware';
 import { Request, Response } from 'express';
 import requestIp from 'request-ip';
 
