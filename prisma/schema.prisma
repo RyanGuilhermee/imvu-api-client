@@ -49,7 +49,7 @@ model Reward {
 model RefreshToken {
   id         String @id @default(uuid())
   expires_in Int
-  ip_address String @unique
+  ip_address String
   user       User   @relation(fields: [user_id], references: [id])
   user_id    String
 
