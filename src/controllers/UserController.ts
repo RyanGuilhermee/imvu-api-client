@@ -54,15 +54,19 @@ export class UserController {
     const { email, password }: { email: string; password: string } = req.body;
     const ipAddress: string | null = requestIp.getClientIp(req);
 
-    const {
-      token,
-      refreshToken
-    }: { token: string; refreshToken?: string | undefined } =
+    const authPayload: { token: string; refreshToken?: string | undefined } =
       await userModel.authentication(email, password, ipAddress);
 
-    res.status(200).json({
-      token,
-      refreshToken
-    });
+    res
+      .status(200)
+      .cookie('auth', authPayload, {
+        httpOnly: true,
+        sameSite: 'strict',
+        secure: true
+      })
+      .json({
+        status: 200,
+        message: 'Successfully authenticated user!'
+      });
   }
 }

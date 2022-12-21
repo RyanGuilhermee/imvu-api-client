@@ -25,12 +25,13 @@ export class RefreshTokenModel {
       throw new BadRequest('Invalid refresh token');
     }
 
+    await this.deleteRefreshToken(reqRefreshToken);
+
     const expires: boolean = dayjs().isAfter(
       dayjs.unix(refreshToken.expires_in)
     );
 
     if (expires) {
-      await this.deleteRefreshToken(reqRefreshToken);
       throw new BadRequest('Expired refresh token');
     }
 
@@ -38,13 +39,11 @@ export class RefreshTokenModel {
       throw new Forbbiden('Source of request is unknown');
     }
 
-    await this.deleteRefreshToken(reqRefreshToken);
-
     const token = jwt.sign(
       { id: refreshToken.user_id },
       process.env.JWT_SECRET as string,
       {
-        expiresIn: '1h'
+        expiresIn: '20s'
       }
     );
 
@@ -68,7 +67,7 @@ export class RefreshTokenModel {
     const refreshToken = await prismaClient.refreshToken.create({
       data: {
         user_id: userId,
-        expires_in: dayjs().add(5, 'minutes').unix(),
+        expires_in: dayjs().add(1, 'minutes').unix(),
         ip_address: ipAddress
       }
     });

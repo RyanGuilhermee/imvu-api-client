@@ -10,17 +10,22 @@ export class RefreshTokenController {
   @Post()
   public async execute(req: Request, res: Response): Promise<void> {
     const refreshTokenModel: RefreshTokenModel = new RefreshTokenModel();
-    const reqRefreshToken: string = req.body.refreshToken;
+    const reqRefreshToken: string = req.cookies.auth.refreshToken;
     const ipAddress: string | null = requestIp.getClientIp(req);
 
-    const { token, refreshToken } = await refreshTokenModel.execute(
-      reqRefreshToken,
-      ipAddress
-    );
+    const refreshAuthPayload: { token: string; refreshToken: string } =
+      await refreshTokenModel.execute(reqRefreshToken, ipAddress);
 
-    res.status(201).json({
-      token,
-      refreshToken
-    });
+    res
+      .status(201)
+      .cookie('auth', refreshAuthPayload, {
+        httpOnly: true,
+        sameSite: 'strict',
+        secure: true
+      })
+      .json({
+        status: 201,
+        message: 'Successfully token generated!'
+      });
   }
 }

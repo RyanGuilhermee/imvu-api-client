@@ -101,7 +101,7 @@ export class UserModel {
     }
 
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET as string, {
-      expiresIn: '1h'
+      expiresIn: '20s'
     });
 
     if (!ipAddress) {

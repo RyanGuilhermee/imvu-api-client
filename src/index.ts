@@ -1,4 +1,5 @@
 import { json } from 'express';
+import cookieParser from 'cookie-parser';
 import { Server } from '@overnightjs/core';
 import { HomeController } from '@controllers/HomeController';
 import { UserController } from '@controllers/UserController';
@@ -17,6 +18,7 @@ export class SetupServer extends Server {
 
   private setupExpress(): void {
     this.app.use(json());
+    this.app.use(cookieParser());
   }
 
   private setupControllers(): void {

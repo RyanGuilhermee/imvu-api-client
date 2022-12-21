@@ -2,21 +2,24 @@ import { Unauthorized } from '@src/errors/Unauthorized';
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
+type Auth = {
+  token: string;
+  refresh?: string;
+};
+
 export const authorizationHandler = (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const fullToken: string | undefined = req.headers.authorization;
+  const auth: Auth = req.cookies.auth;
 
-  if (!fullToken) {
+  if (!auth) {
     throw new Unauthorized('Token is missing');
   }
 
-  const [, token] = fullToken.split(' ');
-
   try {
-    jwt.verify(token, process.env.JWT_SECRET as string);
+    jwt.verify(auth.token, process.env.JWT_SECRET as string);
 
     next();
   } catch (error) {
