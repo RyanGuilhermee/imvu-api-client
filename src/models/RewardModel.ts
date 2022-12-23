@@ -19,7 +19,7 @@ export class RewardModel {
 
   public async get(accountId: string): Promise<Reward[]> {
     const prismaClient = new PrismaClient();
-    console.log(accountId);
+
     const reward = await prismaClient.reward.findMany({
       where: {
         imvu_account_id: accountId

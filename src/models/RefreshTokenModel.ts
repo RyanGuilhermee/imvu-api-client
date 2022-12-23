@@ -1,25 +1,29 @@
-import { PrismaClient, RefreshToken } from '@prisma/client';
+import { RefreshToken } from '@prisma/client';
 import { BadRequest } from '@src/errors/BadRequest';
 import { Forbbiden } from '@src/errors/Forbidden';
 import jwt from 'jsonwebtoken';
 import dayjs from 'dayjs';
+import { prismaClient } from '@src/utils/PrismaClientInstance';
 
 export class RefreshTokenModel {
   public async execute(
     reqRefreshToken: string,
+    auth: string,
     ipAddress: string | null
   ): Promise<{ token: string; refreshToken: string }> {
     if (!reqRefreshToken) {
       throw new BadRequest('Refresh token missing');
     }
 
-    const prismaClient = new PrismaClient();
-
     const refreshToken = await prismaClient.refreshToken.findFirst({
       where: {
         id: reqRefreshToken
       }
     });
+
+    const tokenDecoded = jwt.decode(auth);
+
+    console.log(tokenDecoded);
 
     if (!refreshToken) {
       throw new BadRequest('Invalid refresh token');
@@ -62,8 +66,6 @@ export class RefreshTokenModel {
     userId: string,
     ipAddress: string
   ): Promise<RefreshToken> {
-    const prismaClient = new PrismaClient();
-
     const refreshToken = await prismaClient.refreshToken.create({
       data: {
         user_id: userId,
@@ -76,8 +78,6 @@ export class RefreshTokenModel {
   }
 
   public async deleteRefreshToken(reqRefreshToken: string): Promise<void> {
-    const prismaClient = new PrismaClient();
-
     await prismaClient.refreshToken.delete({
       where: {
         id: reqRefreshToken

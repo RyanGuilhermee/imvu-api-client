@@ -25,7 +25,7 @@ export class RewardController {
     res.status(201).json(reward);
   }
 
-  @Get(':id')
+  @Get(':account_id')
   public async get(req: Request, res: Response): Promise<void> {
     const rewardModel: RewardModel = new RewardModel();
     const accountId: string = req.params.account_id as string;

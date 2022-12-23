@@ -1,7 +1,8 @@
-import { PrismaClient, UserImvuAccount } from '@prisma/client';
+import { UserImvuAccount } from '@prisma/client';
 import { BadRequest } from '@src/errors/BadRequest';
 import { NotFound } from '@src/errors/NotFound';
 import CryptoJS from 'crypto-js';
+import { prismaClient } from '@src/utils/PrismaClientInstance';
 
 export class ImvuAccountModel {
   public async create(
@@ -16,8 +17,6 @@ export class ImvuAccountModel {
     if (exists) {
       throw new BadRequest('Imvu account already exists');
     }
-
-    const prismaClient = new PrismaClient();
 
     const cipherPass = CryptoJS.AES.encrypt(
       imvuAccountData.password,
@@ -50,8 +49,6 @@ export class ImvuAccountModel {
       throw new BadRequest('Imvu account does not exists');
     }
 
-    const prismaClient = new PrismaClient();
-
     let cipherPass: string | undefined = undefined;
 
     if (imvuAccountData.password) {
@@ -78,8 +75,6 @@ export class ImvuAccountModel {
     userId: string,
     accountId: string
   ): Promise<UserImvuAccount[]> {
-    const prismaClient = new PrismaClient();
-
     const imvuAccounts = await prismaClient.userImvuAccount.findMany({
       where: { user_id: userId || undefined, id: accountId || undefined },
       orderBy: { username: 'asc' }
@@ -106,8 +101,6 @@ export class ImvuAccountModel {
       throw new BadRequest('Imvu account does not exist');
     }
 
-    const prismaClient = new PrismaClient();
-
     const imvuAccount = await prismaClient.userImvuAccount.delete({
       where: { id: accountId }
     });
@@ -120,8 +113,6 @@ export class ImvuAccountModel {
     accountId: string,
     username: string
   ): Promise<boolean> {
-    const prismaClient = new PrismaClient();
-
     const user = await prismaClient.userImvuAccount.findFirst({
       where: {
         user_id: userId,

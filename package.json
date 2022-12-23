@@ -8,7 +8,7 @@
     "license": "MIT",
     "scripts": {
         "build": "tsc && tsc-alias",
-        "dev": "ts-node-dev -r tsconfig-paths/register --respawn --ignore-watch node_modules --exit-child ./src/server.ts",
+        "dev": "ts-node-dev -r tsconfig-paths/register --respawn --ignore-watch node_modules --exit-child --files ./src/server.ts",
         "test": "jest"
     },
     "devDependencies": {

@@ -1,9 +1,10 @@
-import { PrismaClient, User } from '@prisma/client';
+import { User } from '@prisma/client';
 import { BadRequest } from '@src/errors/BadRequest';
 import { NotFound } from '@src/errors/NotFound';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { RefreshTokenModel } from './RefreshTokenModel';
+import { prismaClient } from '@src/utils/PrismaClientInstance';
 
 export class UserModel {
   public async create(userData: User): Promise<User> {
@@ -13,7 +14,7 @@ export class UserModel {
       throw new BadRequest('User already exists');
     }
 
-    const prismaClient = new PrismaClient();
+    //const prismaClient = new PrismaClient();
 
     const hashPassword: string = await bcrypt.hash(userData.password, 10);
 
@@ -29,7 +30,7 @@ export class UserModel {
   }
 
   public async get(userId: string): Promise<User> {
-    const prismaClient = new PrismaClient();
+    //const prismaClient = new PrismaClient();
 
     const user = await prismaClient.user.findFirst({
       where: { id: userId }
@@ -49,8 +50,6 @@ export class UserModel {
       throw new BadRequest('User does not exist');
     }
 
-    const prismaClient = new PrismaClient();
-
     const user = await prismaClient.user.delete({
       where: { id: userId }
     });
@@ -59,8 +58,6 @@ export class UserModel {
   }
 
   public async userExists(userId: string, email: string): Promise<boolean> {
-    const prismaClient = new PrismaClient();
-
     const user = await prismaClient.user.findFirst({
       where: {
         id: userId ? userId : undefined,
@@ -83,8 +80,6 @@ export class UserModel {
     if (!email || !password) {
       throw new BadRequest('Email or password is missing');
     }
-
-    const prismaClient = new PrismaClient();
 
     const user = await prismaClient.user.findFirst({
       where: { email: email }
