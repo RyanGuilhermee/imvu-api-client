@@ -11,11 +11,10 @@ export class RefreshTokenController {
   public async execute(req: Request, res: Response): Promise<void> {
     const refreshTokenModel: RefreshTokenModel = new RefreshTokenModel();
     const reqRefreshToken: string = req.cookies.auth.refreshToken;
-    const token = req.cookies.auth.token;
     const ipAddress: string | null = requestIp.getClientIp(req);
 
     const refreshAuthPayload: { token: string; refreshToken: string } =
-      await refreshTokenModel.execute(reqRefreshToken, token, ipAddress);
+      await refreshTokenModel.execute(reqRefreshToken, ipAddress);
 
     res
       .status(201)

@@ -8,7 +8,6 @@ import { prismaClient } from '@src/utils/PrismaClientInstance';
 export class RefreshTokenModel {
   public async execute(
     reqRefreshToken: string,
-    auth: string,
     ipAddress: string | null
   ): Promise<{ token: string; refreshToken: string }> {
     if (!reqRefreshToken) {
@@ -21,15 +20,9 @@ export class RefreshTokenModel {
       }
     });
 
-    const tokenDecoded = jwt.decode(auth);
-
-    console.log(tokenDecoded);
-
     if (!refreshToken) {
       throw new BadRequest('Invalid refresh token');
     }
-
-    await this.deleteRefreshToken(reqRefreshToken);
 
     const expires: boolean = dayjs().isAfter(
       dayjs.unix(refreshToken.expires_in)
@@ -40,6 +33,7 @@ export class RefreshTokenModel {
     }
 
     if (ipAddress !== refreshToken.ip_address) {
+      await this.deleteRefreshToken('', reqRefreshToken);
       throw new Forbbiden('Source of request is unknown');
     }
 
@@ -66,6 +60,8 @@ export class RefreshTokenModel {
     userId: string,
     ipAddress: string
   ): Promise<RefreshToken> {
+    await this.deleteRefreshToken(userId);
+
     const refreshToken = await prismaClient.refreshToken.create({
       data: {
         user_id: userId,
@@ -77,10 +73,14 @@ export class RefreshTokenModel {
     return refreshToken;
   }
 
-  public async deleteRefreshToken(reqRefreshToken: string): Promise<void> {
-    await prismaClient.refreshToken.delete({
+  public async deleteRefreshToken(
+    userId: string,
+    reqRefreshToken?: string
+  ): Promise<void> {
+    await prismaClient.refreshToken.deleteMany({
       where: {
-        id: reqRefreshToken
+        user_id: userId ? userId : undefined,
+        id: reqRefreshToken ? userId : undefined
       }
     });
   }
