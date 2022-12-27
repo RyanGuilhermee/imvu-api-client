@@ -10,6 +10,7 @@ import {
 import { User } from '@prisma/client';
 import { errorHandler } from '@src/middlewares/errorMiddleware';
 import { authorizationHandler } from '@src/middlewares/authorizationMiddleware';
+import { rateLimitHandler } from '@src/middlewares/rateLimitMiddleware';
 import { Request, Response } from 'express';
 import requestIp from 'request-ip';
 
@@ -49,6 +50,7 @@ export class UserController {
   }
 
   @Post('login')
+  @Middleware(rateLimitHandler)
   public async authentication(req: Request, res: Response): Promise<void> {
     const userModel: UserModel = new UserModel();
     const { email, password }: { email: string; password: string } = req.body;
