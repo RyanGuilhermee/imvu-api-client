@@ -14,8 +14,6 @@ export class UserModel {
       throw new BadRequest('User already exists');
     }
 
-    //const prismaClient = new PrismaClient();
-
     const hashPassword: string = await bcrypt.hash(userData.password, 10);
 
     const user = await prismaClient.user.create({
@@ -96,7 +94,7 @@ export class UserModel {
     }
 
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET as string, {
-      expiresIn: '20s'
+      expiresIn: '1h'
     });
 
     if (!ipAddress) {
