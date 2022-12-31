@@ -1,11 +1,11 @@
-import { PrismaClient, Reward } from '@prisma/client';
+import { Reward } from '@prisma/client';
 import { NotFound } from '@src/errors/NotFound';
+import { prismaClient } from '@src/utils/PrismaClientInstance';
 
 export class RewardModel {
   public async create(rewardData: Reward): Promise<Reward> {
-    const prismaClient = new PrismaClient();
     const isNumber: number = Number(rewardData.name);
-    console.log(rewardData);
+
     const reward = await prismaClient.reward.create({
       data: {
         imvu_account_id: rewardData.imvu_account_id,
@@ -18,8 +18,6 @@ export class RewardModel {
   }
 
   public async get(accountId: string): Promise<Reward[]> {
-    const prismaClient = new PrismaClient();
-
     const reward = await prismaClient.reward.findMany({
       where: {
         imvu_account_id: accountId

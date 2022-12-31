@@ -22,9 +22,32 @@ export class UserController {
     const userModel: UserModel = new UserModel();
     const userData: User = req.body;
 
-    const user: User = await userModel.create(userData);
+    const user = await userModel.create(userData);
 
     res.status(201).json(user);
+  }
+
+  @Get('confirm')
+  public async emailConfirmation(req: Request, res: Response): Promise<void> {
+    const userModel: UserModel = new UserModel();
+    const token: string = req.query.token as string;
+
+    const response = await userModel.emailConfirmation(token);
+
+    res.status(200).json(response);
+  }
+
+  @Get('resend')
+  public async resendEmailConfirmation(
+    req: Request,
+    res: Response
+  ): Promise<void> {
+    const userModel: UserModel = new UserModel();
+    const email: string = req.body.email as string;
+
+    const response = await userModel.resendEmailConfirmation(email);
+
+    res.status(200).json(response);
   }
 
   @Get(':id')
