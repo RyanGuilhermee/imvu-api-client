@@ -24,11 +24,11 @@ export class RefreshTokenModel {
       throw new BadRequest('Invalid refresh token');
     }
 
-    const expires: boolean = dayjs().isAfter(
+    const expired: boolean = dayjs().isAfter(
       dayjs.unix(refreshToken.expires_in)
     );
 
-    if (expires) {
+    if (expired) {
       throw new BadRequest('Expired refresh token');
     }
 

@@ -174,9 +174,9 @@ export class UserModel {
 
     const user: User = await this.get(token.user_id);
 
-    const expires: boolean = dayjs().isAfter(dayjs.unix(token.expires_in));
+    const expired: boolean = dayjs().isAfter(dayjs.unix(token.expires_in));
 
-    if (expires) {
+    if (expired) {
       await EmailVerificationTokenModel.delete(user.id);
       throw new BadRequest('Expired confirmation token');
     }
