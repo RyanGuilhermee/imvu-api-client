@@ -16,7 +16,7 @@ export class EmailVerification {
       html: `
             <h2>Olá, ${user.name}!</h2>
             <p>Obrigado por se cadastrar. Por favor, confirme seu email clicando
-              <a href="https://test.loca.lt/user/confirm?token=${token}" style="color: blue;">aqui</a>
+              <a href="${process.env.DOMAIN}/user/confirm?token=${token}" style="color: blue;">aqui</a>
             </p>
         `
     });

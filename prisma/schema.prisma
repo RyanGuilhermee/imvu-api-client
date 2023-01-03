@@ -20,6 +20,7 @@ model User {
   UserImvuAccount        UserImvuAccount[]
   RefreshToken           RefreshToken[]
   EmailVerificationToken EmailVerificationToken?
+  PasswordResetToken     PasswordResetToken?
 
   @@map("users")
 }
@@ -66,4 +67,14 @@ model EmailVerificationToken {
   user_id    String @unique
 
   @@map("email_verification_token")
+}
+
+model PasswordResetToken {
+  id         String @id @default(uuid())
+  token      String
+  expires_in Int
+  user       User   @relation(fields: [user_id], references: [id])
+  user_id    String @unique
+
+  @@map("password_reset_token")
 }

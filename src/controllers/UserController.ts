@@ -5,7 +5,8 @@ import {
   ClassErrorMiddleware,
   Delete,
   Get,
-  Post
+  Post,
+  Patch
 } from '@overnightjs/core';
 import { User } from '@prisma/client';
 import { errorHandler } from '@src/middlewares/errorMiddleware';
@@ -27,6 +28,30 @@ export class UserController {
     res.status(201).json(user);
   }
 
+  @Post('password-reset')
+  public async sendPasswordResetEmail(
+    req: Request,
+    res: Response
+  ): Promise<void> {
+    const userModel: UserModel = new UserModel();
+    const email: string = req.body.email as string;
+
+    const response = await userModel.sendPasswordResetEmail(email);
+
+    res.status(200).json(response);
+  }
+
+  @Patch('password-reset')
+  public async updateUserPassword(req: Request, res: Response): Promise<void> {
+    const userModel: UserModel = new UserModel();
+    const token: string = req.query.token as string;
+    const newPassword: string = req.body.newPassword as string;
+
+    const response = await userModel.updateUserPassword(token, newPassword);
+
+    res.status(200).json(response);
+  }
+
   @Get('confirm')
   public async emailConfirmation(req: Request, res: Response): Promise<void> {
     const userModel: UserModel = new UserModel();
@@ -37,7 +62,7 @@ export class UserController {
     res.status(200).json(response);
   }
 
-  @Get('resend')
+  @Post('resend')
   public async resendEmailConfirmation(
     req: Request,
     res: Response
