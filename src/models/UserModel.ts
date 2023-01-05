@@ -14,6 +14,7 @@ import dayjs from 'dayjs';
 import { EmailVerification } from '@src/providers/EmailVerification';
 import { PasswordResetEmail } from '@src/providers/PasswordResetEmail';
 import { PasswordResetTokenModel } from './PasswordResetTokenModel';
+import PasswordValidator from 'password-validator';
 
 export class UserModel {
   public async create(userData: User): Promise<{}> {
@@ -21,6 +22,31 @@ export class UserModel {
 
     if (exists) {
       throw new BadRequest('User already exists');
+    }
+
+    const schema: PasswordValidator = new PasswordValidator();
+    schema
+      .is()
+      .min(8)
+      .is()
+      .max(200)
+      .has()
+      .letters()
+      .has()
+      .uppercase()
+      .lowercase()
+      .has()
+      .not()
+      .spaces()
+      .has()
+      .symbols();
+
+    if (!schema.validate(userData.password)) {
+      const details = schema.validate(userData.password, {
+        details: true
+      }) as any[];
+
+      throw new BadRequest(details[0].message);
     }
 
     const hashPassword: string = await bcrypt.hash(userData.password, 10);
@@ -256,6 +282,29 @@ export class UserModel {
     if (expired) {
       await PasswordResetTokenModel.delete(user.id);
       throw new BadRequest('Expired reset token');
+    }
+
+    const schema: PasswordValidator = new PasswordValidator();
+    schema
+      .is()
+      .min(8)
+      .is()
+      .max(200)
+      .has()
+      .letters()
+      .has()
+      .uppercase()
+      .lowercase()
+      .has()
+      .not()
+      .spaces()
+      .has()
+      .symbols();
+
+    if (!schema.validate(newPassword)) {
+      const details = schema.validate(newPassword, { details: true }) as any[];
+
+      throw new BadRequest(details[0].message);
     }
 
     const hashNewPassword: string = await bcrypt.hash(newPassword, 10);
