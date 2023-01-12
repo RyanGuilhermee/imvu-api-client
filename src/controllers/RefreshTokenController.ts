@@ -1,4 +1,7 @@
-import { RefreshTokenModel } from '@models/RefreshTokenModel';
+import {
+  RefreshTokenModel,
+  RefreshTokenOutput
+} from '@models/RefreshTokenModel';
 import { Controller, ClassErrorMiddleware, Post } from '@overnightjs/core';
 import { errorHandler } from '@src/middlewares/errorMiddleware';
 import { Request, Response } from 'express';
@@ -13,7 +16,7 @@ export class RefreshTokenController {
     const reqRefreshToken: string = req.cookies.auth.refreshToken;
     const ipAddress: string | null = requestIp.getClientIp(req);
 
-    const refreshAuthPayload: { token: string; refreshToken: string } =
+    const refreshAuthPayload: RefreshTokenOutput =
       await refreshTokenModel.execute(reqRefreshToken, ipAddress);
 
     res

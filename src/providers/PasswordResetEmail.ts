@@ -1,9 +1,9 @@
-import { User } from '@prisma/client';
+import { GetUserDto } from '@src/dtos/user/GetUserDto';
 import { PasswordResetTokenModel } from '@src/models/PasswordResetTokenModel';
 import { Email } from './Email';
 
 export class PasswordResetEmail {
-  public static async sendEmail(user: User): Promise<void> {
+  public static async sendEmail(user: GetUserDto): Promise<void> {
     const token: string = await PasswordResetTokenModel.create(
       user.email,
       user.id

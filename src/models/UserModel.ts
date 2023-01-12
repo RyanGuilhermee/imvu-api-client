@@ -15,9 +15,23 @@ import { EmailVerification } from '@src/providers/EmailVerification';
 import { PasswordResetEmail } from '@src/providers/PasswordResetEmail';
 import { PasswordResetTokenModel } from './PasswordResetTokenModel';
 import PasswordValidator from 'password-validator';
+import { CreateUserDto } from '@src/dtos/user/CreateUserDto';
+import { UpdateUserDto } from '@src/dtos/user/UpdateUserDto';
+import { GetUserDto } from '@src/dtos/user/GetUserDto';
+
+export type UserCreateOutput = {
+  name: string;
+  email: string;
+  message: string;
+};
+
+export type UserOuput = {
+  status: number;
+  message: string;
+};
 
 export class UserModel {
-  public async create(userData: User): Promise<{}> {
+  public async create(userData: CreateUserDto): Promise<UserCreateOutput> {
     const exists: boolean = await this.userExists('', userData.email);
 
     if (exists) {
@@ -69,7 +83,10 @@ export class UserModel {
     };
   }
 
-  public async update(userId: string, userData: User): Promise<User> {
+  private async update(
+    userId: string,
+    userData: UpdateUserDto
+  ): Promise<UserOuput> {
     if (!userId) {
       throw new BadRequest('User id missing');
     }
@@ -85,11 +102,14 @@ export class UserModel {
       }
     });
 
-    return user;
+    return {
+      status: 200,
+      message: 'User data updated successfully!'
+    };
   }
 
-  public async get(userId: string): Promise<User> {
-    const user = await prismaClient.user.findFirst({
+  public async get(userId: string): Promise<GetUserDto> {
+    const user: User | null = await prismaClient.user.findFirst({
       where: { id: userId }
     });
 
@@ -97,11 +117,17 @@ export class UserModel {
       throw new NotFound('User not found');
     }
 
-    return user;
+    const userDto: GetUserDto = new GetUserDto();
+    userDto.id = user.id;
+    userDto.name = user.name;
+    userDto.email = user.email;
+    userDto.verified = user.verified;
+
+    return userDto;
   }
 
-  private async getByEmail(email: string): Promise<User> {
-    const user = await prismaClient.user.findFirst({
+  private async getByEmail(email: string): Promise<GetUserDto> {
+    const user: User | null = await prismaClient.user.findFirst({
       where: { email: email }
     });
 
@@ -109,10 +135,16 @@ export class UserModel {
       throw new NotFound('User not found');
     }
 
-    return user;
+    const userDto: GetUserDto = new GetUserDto();
+    userDto.id = user.id;
+    userDto.name = user.name;
+    userDto.email = user.email;
+    userDto.verified = user.verified;
+
+    return userDto;
   }
 
-  public async delete(userId: string) {
+  public async delete(userId: string): Promise<UserOuput> {
     const exists: boolean = await this.userExists(userId, '');
 
     if (!exists) {
@@ -195,7 +227,7 @@ export class UserModel {
     };
   }
 
-  public async emailConfirmation(hashToken: string) {
+  public async emailConfirmation(hashToken: string): Promise<UserOuput> {
     if (!hashToken) {
       throw new BadRequest('Missing confirmation token');
     }
@@ -204,7 +236,7 @@ export class UserModel {
       hashToken
     );
 
-    const user: User = await this.get(token.user_id);
+    const user: GetUserDto = await this.get(token.user_id);
 
     const expired: boolean = dayjs().isAfter(dayjs.unix(token.expires_in));
 
@@ -214,12 +246,7 @@ export class UserModel {
     }
 
     await this.update(user.id, {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      password: user.password,
-      verified: true,
-      created_at: user.created_at
+      verified: true
     });
 
     await EmailVerificationTokenModel.delete(user.id);
@@ -230,12 +257,12 @@ export class UserModel {
     };
   }
 
-  public async resendEmailConfirmation(email: string) {
+  public async resendEmailConfirmation(email: string): Promise<UserOuput> {
     if (!email) {
       throw new BadRequest('Missing email');
     }
 
-    const user: User = await this.getByEmail(email);
+    const user: GetUserDto = await this.getByEmail(email);
 
     await EmailVerification.sendEmail(user);
 
@@ -245,12 +272,12 @@ export class UserModel {
     };
   }
 
-  public async sendPasswordResetEmail(email: string) {
+  public async sendPasswordResetEmail(email: string): Promise<UserOuput> {
     if (!email) {
       throw new BadRequest('Missing email');
     }
 
-    const user: User = await this.getByEmail(email);
+    const user: GetUserDto = await this.getByEmail(email);
 
     if (!user.verified) {
       throw new BadRequest(
@@ -266,7 +293,10 @@ export class UserModel {
     };
   }
 
-  public async updateUserPassword(hashToken: string, newPassword: string) {
+  public async updateUserPassword(
+    hashToken: string,
+    newPassword: string
+  ): Promise<UserOuput> {
     if (!hashToken) {
       throw new BadRequest('Missing reset token');
     }
@@ -275,7 +305,7 @@ export class UserModel {
       hashToken
     );
 
-    const user: User = await this.get(token.user_id);
+    const user: GetUserDto = await this.get(token.user_id);
 
     const expired: boolean = dayjs().isAfter(dayjs.unix(token.expires_in));
 
@@ -310,12 +340,7 @@ export class UserModel {
     const hashNewPassword: string = await bcrypt.hash(newPassword, 10);
 
     await this.update(user.id, {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      password: hashNewPassword,
-      verified: user.verified,
-      created_at: user.created_at
+      password: hashNewPassword
     });
 
     await PasswordResetTokenModel.delete(user.id);

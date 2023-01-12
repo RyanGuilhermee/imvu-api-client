@@ -1,4 +1,4 @@
-import { UserModel } from '@models/UserModel';
+import { UserCreateOutput, UserModel, UserOuput } from '@models/UserModel';
 import {
   Controller,
   Middleware,
@@ -8,12 +8,13 @@ import {
   Post,
   Patch
 } from '@overnightjs/core';
-import { User } from '@prisma/client';
 import { errorHandler } from '@src/middlewares/errorMiddleware';
 import { authorizationHandler } from '@src/middlewares/authorizationMiddleware';
 import { rateLimitHandler } from '@src/middlewares/rateLimitMiddleware';
 import { Request, Response } from 'express';
 import requestIp from 'request-ip';
+import { CreateUserDto } from '@src/dtos/user/CreateUserDto';
+import { GetUserDto } from '@src/dtos/user/GetUserDto';
 
 @Controller('user')
 @ClassErrorMiddleware(errorHandler)
@@ -21,9 +22,9 @@ export class UserController {
   @Post()
   public async create(req: Request, res: Response): Promise<void> {
     const userModel: UserModel = new UserModel();
-    const userData: User = req.body;
+    const userData: CreateUserDto = req.body;
 
-    const user = await userModel.create(userData);
+    const user: UserCreateOutput = await userModel.create(userData);
 
     res.status(201).json(user);
   }
@@ -36,7 +37,7 @@ export class UserController {
     const userModel: UserModel = new UserModel();
     const email: string = req.body.email as string;
 
-    const response = await userModel.sendPasswordResetEmail(email);
+    const response: UserOuput = await userModel.sendPasswordResetEmail(email);
 
     res.status(200).json(response);
   }
@@ -47,7 +48,10 @@ export class UserController {
     const token: string = req.query.token as string;
     const newPassword: string = req.body.newPassword as string;
 
-    const response = await userModel.updateUserPassword(token, newPassword);
+    const response: UserOuput = await userModel.updateUserPassword(
+      token,
+      newPassword
+    );
 
     res.status(200).json(response);
   }
@@ -57,7 +61,7 @@ export class UserController {
     const userModel: UserModel = new UserModel();
     const token: string = req.query.token as string;
 
-    const response = await userModel.emailConfirmation(token);
+    const response: UserOuput = await userModel.emailConfirmation(token);
 
     res.status(200).json(response);
   }
@@ -70,7 +74,7 @@ export class UserController {
     const userModel: UserModel = new UserModel();
     const email: string = req.body.email as string;
 
-    const response = await userModel.resendEmailConfirmation(email);
+    const response: UserOuput = await userModel.resendEmailConfirmation(email);
 
     res.status(200).json(response);
   }
@@ -81,7 +85,7 @@ export class UserController {
     const userModel: UserModel = new UserModel();
     const userId: string = req.params.id;
 
-    const user: User = await userModel.get(userId);
+    const user: GetUserDto = await userModel.get(userId);
 
     res.status(200).json(user);
   }
@@ -92,7 +96,7 @@ export class UserController {
     const userModel: UserModel = new UserModel();
     const userId: string = req.params.id;
 
-    const user = await userModel.delete(userId);
+    const user: UserOuput = await userModel.delete(userId);
 
     res.status(200).json(user);
   }

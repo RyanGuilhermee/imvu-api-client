@@ -1,9 +1,9 @@
-import { User } from '@prisma/client';
+import { GetUserDto } from '@src/dtos/user/GetUserDto';
 import { EmailVerificationTokenModel } from '@src/models/EmailVerificationTokenModel';
 import { Email } from './Email';
 
 export class EmailVerification {
-  public static async sendEmail(user: User): Promise<void> {
+  public static async sendEmail(user: GetUserDto): Promise<void> {
     const token: string = await EmailVerificationTokenModel.create(
       user.email,
       user.id

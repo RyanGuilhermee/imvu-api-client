@@ -1,4 +1,9 @@
-import { ImvuAccountInfos, ImvuAccountModel } from '@models/ImvuAccountModel';
+import {
+  ImvuAccountInfosOutput,
+  ImvuAccountModel,
+  ImvuAccountOutput,
+  UserCreateImvuAccountOutput
+} from '@models/ImvuAccountModel';
 import {
   Controller,
   ClassMiddleware,
@@ -22,8 +27,9 @@ export class ImvuAccountController {
     const accountModel: ImvuAccountModel = new ImvuAccountModel();
     const accountData: UserImvuAccount = req.body;
 
-    const account: { userId: string; id: string; infos: ImvuAccountInfos } =
-      await accountModel.create(accountData);
+    const account: UserCreateImvuAccountOutput = await accountModel.create(
+      accountData
+    );
 
     res.status(201).json(account);
   }
@@ -35,7 +41,7 @@ export class ImvuAccountController {
     const accountId: string = req.query.account_id as string;
     const accountData: UserImvuAccount = req.body;
 
-    const account: UserImvuAccount = await accountModel.update(
+    const account: ImvuAccountOutput = await accountModel.update(
       accountData,
       userId,
       accountId
@@ -63,10 +69,8 @@ export class ImvuAccountController {
     const accountModel: ImvuAccountModel = new ImvuAccountModel();
     const userId: string = req.query.user_id as string;
 
-    const accountInfos: {
-      userId: string;
-      imvuAccountsInfos: { id: string; infos: ImvuAccountInfos }[];
-    } = await accountModel.getImvuInfosByUserId(userId);
+    const accountInfos: ImvuAccountInfosOutput =
+      await accountModel.getImvuInfosByUserId(userId);
 
     res.status(200).json(accountInfos);
   }
@@ -77,7 +81,7 @@ export class ImvuAccountController {
     const userId: string = req.query.user_id as string;
     const accountId: string = req.query.account_id as string;
 
-    const account: UserImvuAccount = await accountModel.delete(
+    const account: ImvuAccountOutput = await accountModel.delete(
       userId,
       accountId
     );

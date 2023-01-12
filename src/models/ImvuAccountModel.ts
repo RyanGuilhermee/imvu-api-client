@@ -24,10 +24,29 @@ export type ImvuAccountInfos = {
   followerCount: number | undefined;
 };
 
+export type UserCreateImvuAccountOutput = {
+  userId: string;
+  id: string;
+  infos: ImvuAccountInfos;
+};
+
+export type ImvuAccountOutput = {
+  status: number;
+  message: string;
+};
+
+export type ImvuAccountInfosOutput = {
+  userId: string;
+  imvuAccountsInfos: {
+    id: string;
+    infos: ImvuAccountInfos;
+  }[];
+};
+
 export class ImvuAccountModel {
   public async create(
     imvuAccountData: UserImvuAccount
-  ): Promise<{ userId: string; id: string; infos: ImvuAccountInfos }> {
+  ): Promise<UserCreateImvuAccountOutput> {
     const exists: boolean = await this.imvuAccountExists(
       imvuAccountData.user_id,
       '',
@@ -67,7 +86,7 @@ export class ImvuAccountModel {
     imvuAccountData: UserImvuAccount,
     userId: string,
     accountId: string
-  ): Promise<UserImvuAccount> {
+  ): Promise<ImvuAccountOutput> {
     if (!userId || !accountId) {
       throw new BadRequest('User or account id is missing');
     }
@@ -87,7 +106,7 @@ export class ImvuAccountModel {
       ).toString();
     }
 
-    const imvuAccount = await prismaClient.userImvuAccount.update({
+    await prismaClient.userImvuAccount.update({
       where: {
         id: accountId
       },
@@ -97,7 +116,10 @@ export class ImvuAccountModel {
       }
     });
 
-    return imvuAccount;
+    return {
+      status: 200,
+      message: 'Imvu account data updated successfully'
+    };
   }
 
   public async get(
@@ -123,7 +145,7 @@ export class ImvuAccountModel {
   public async delete(
     userId: string,
     accountId: string
-  ): Promise<UserImvuAccount> {
+  ): Promise<ImvuAccountOutput> {
     if (!userId || !accountId) {
       throw new BadRequest('User or account id is missing');
     }
@@ -134,11 +156,14 @@ export class ImvuAccountModel {
       throw new BadRequest('Imvu account does not exist');
     }
 
-    const imvuAccount = await prismaClient.userImvuAccount.delete({
+    await prismaClient.userImvuAccount.delete({
       where: { id: accountId }
     });
 
-    return imvuAccount;
+    return {
+      status: 200,
+      message: 'Account deleted successfully!'
+    };
   }
 
   public async imvuAccountExists(
@@ -199,10 +224,9 @@ export class ImvuAccountModel {
     }
   }
 
-  public async getImvuInfosByUserId(userId: string): Promise<{
-    userId: string;
-    imvuAccountsInfos: { id: string; infos: ImvuAccountInfos }[];
-  }> {
+  public async getImvuInfosByUserId(
+    userId: string
+  ): Promise<ImvuAccountInfosOutput> {
     const imvuAccounts: UserImvuAccount[] = await this.get(userId);
     const imvuAccountsInfos: { id: string; infos: ImvuAccountInfos }[] = [];
 

@@ -5,11 +5,16 @@ import jwt from 'jsonwebtoken';
 import dayjs from 'dayjs';
 import { prismaClient } from '@src/utils/PrismaClientInstance';
 
+export type RefreshTokenOutput = {
+  token: string;
+  refreshToken: string;
+};
+
 export class RefreshTokenModel {
   public async execute(
     reqRefreshToken: string,
     ipAddress: string | null
-  ): Promise<{ token: string; refreshToken: string }> {
+  ): Promise<RefreshTokenOutput> {
     if (!reqRefreshToken) {
       throw new BadRequest('Refresh token missing');
     }
